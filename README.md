@@ -35,7 +35,7 @@ use deployer::Deployer;
 
 fn main() {
 	
-	let config = "config.yml";
+	let config = "deployer.yml";
 	
 	let mut deployer = Deployer::new();
 	deployer.configure(config);
