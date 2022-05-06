@@ -1,12 +1,12 @@
 use deployer::Deployer;
 
 fn main() {
-	let attr = std::env::args().skip(1).next();
-	if attr.is_none() {
-		eprintln!("No config file specified");
-		std::process::exit(1);
-	}
+	let config = match std::env::args().skip(1).next() {
+		Some(path) => path,
+		None => "deployer.yml".to_string()
+	};
+
 	let mut deployer = Deployer::new();
-	deployer.configure(attr.unwrap().as_str());
+	deployer.configure(config.as_str());
 	deployer.deploy();
 }
