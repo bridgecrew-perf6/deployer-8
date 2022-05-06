@@ -1,12 +1,12 @@
 # Deployer
 
-[![deployer crate](https://img.shields.io/crates/v/laravel.svg)](https://crates.io/crates/laravel)
+[![deployer crate](https://img.shields.io/crates/v/deployer.svg)](https://crates.io/crates/deployer)
 [![test](https://github.com/samirdjelal/deployer/workflows/test/badge.svg)](https://github.com/samirdjelal/deployer/actions)
 [![build](https://github.com/samirdjelal/deployer/workflows/build/badge.svg)](https://github.com/samirdjelal/deployer/actions)
 [![issues](https://img.shields.io/github/issues/samirdjelal/deployer?color=%23ffc107)](https://github.com/samirdjelal/deployer/issues)
-[![Downloads](https://img.shields.io/crates/d/laravel)](https://crates.io/crates/laravel)
-[![MIT License](https://img.shields.io/crates/l/laravel)](LICENSE)
-[![deployer documentation](https://img.shields.io/docsrs/laravel)](https://docs.rs/laravel)
+[![Downloads](https://img.shields.io/crates/d/deployer)](https://crates.io/crates/deployer)
+[![MIT License](https://img.shields.io/crates/l/deployer)](LICENSE)
+[![deployer documentation](https://img.shields.io/docsrs/deployer)](https://docs.rs/deployer)
 [![dependency status](https://deps.rs/repo/github/samirdjelal/deployer/status.svg)](https://deps.rs/repo/github/samirdjelal/deployer)
 
 A simple Laravel deployer for your projects.
@@ -25,13 +25,13 @@ Add the following dependency to the Cargo.toml file:
 
 ```toml
 [dependencies]
-laravel = "0.0.1"
+deployer = "0.0.1"
 ```
 
 And then get started in your `main.rs`:
 
 ```rust
-use laravel::Deployer;
+use deployer::Deployer;
 
 fn main() {
 	

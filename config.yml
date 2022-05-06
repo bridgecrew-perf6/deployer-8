@@ -1,4 +1,4 @@
-repository: git@github.com:samirdjelal/laravel-deployer.git
+repository: git@github.com:samirdjelal/deployer.git
 hostname: localhost
 remote_user: root
 deploy_path: /data/wwwroot/default
