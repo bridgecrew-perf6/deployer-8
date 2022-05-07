@@ -1,3 +1,4 @@
+---
 repository: git@github.com:samirdjelal/deployer.git
 hostname: localhost
 remote_user: root

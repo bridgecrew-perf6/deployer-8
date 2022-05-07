@@ -1,21 +1,19 @@
-extern crate yaml_rust;
+use serde::{Serialize, Deserialize};
 
-use yaml_rust::{YamlLoader, Yaml};
-
+#[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Deployer {
-	config: Vec<Yaml>,
 	repository: Option<String>,
 	hostname: Option<String>,
 	remote_user: Option<String>,
 	deploy_path: Option<String>,
-	keep_releases: Option<i32>,
+	keep_releases: Option<String>,
 	http_user: Option<String>,
 	php_path: Option<String>,
 	shared_files: Option<Vec<String>>,
 	shared_dirs: Option<Vec<String>>,
 	writable_use_sudo: Option<bool>,
 	writable_recursive: Option<bool>,
-	writable_chmod_mode: Option<i32>,
+	writable_chmod_mode: Option<String>,
 	writable_dirs: Option<Vec<String>>,
 	tasks: Option<Vec<String>>,
 }
@@ -23,7 +21,6 @@ pub struct Deployer {
 impl Deployer {
 	pub fn new() -> Self {
 		Self {
-			config: vec![],
 			repository: None,
 			hostname: None,
 			remote_user: None,
@@ -45,42 +42,27 @@ impl Deployer {
 			panic!("File does not exist: {}", path);
 		}
 		let contents = std::fs::read_to_string(path).expect("Failed to read config file");
-		let docs = YamlLoader::load_from_str(contents.as_str()).unwrap();
-		self.config = docs.clone();
+		let deployer: Deployer = serde_yaml::from_str(&contents).expect("Failed to parse config file");
+		println!("{:#?}", deployer);
 	}
-	pub fn deploy(&self) {
-		for doc in self.config.iter() {
-			let yaml = doc.clone();
-			match yaml.as_hash() {
-				Some(hash) => {
-					for (key, value) in hash.iter() {
-						println!("{:?}: {:#?}", key, value);
-					}
-				}
-				None => {
-					println!("{:?}", yaml);
-				}
-			}
-		}
-	}
+	pub fn deploy(&self) {}
 }
 
 impl Default for Deployer {
 	fn default() -> Self {
 		Self {
-			config: vec![],
 			repository: Some("git@github.com:samirdjelal/deployer.git".to_string()),
 			hostname: Some("localhost".to_string()),
 			remote_user: Some("root".to_string()),
 			deploy_path: Some("/data/wwwroot/default".to_string()),
-			keep_releases: Some(5),
+			keep_releases: Some("5".to_string()),
 			http_user: Some("daemon".to_string()),
 			php_path: Some("/usr/local/php/bin/php".to_string()),
 			shared_files: Some(vec![".env".to_string()]),
 			shared_dirs: Some(vec!["storage".to_string()]),
 			writable_use_sudo: Some(false),
 			writable_recursive: Some(true),
-			writable_chmod_mode: Some(777),
+			writable_chmod_mode: Some("0777".to_string()),
 			writable_dirs: Some(vec![
 				"bootstrap/cache".to_string(),
 				"storage".to_string(),
