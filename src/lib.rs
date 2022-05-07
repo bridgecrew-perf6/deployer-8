@@ -2,20 +2,20 @@ use serde::{Serialize, Deserialize};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 pub struct Deployer {
-	repository: Option<String>,
-	hostname: Option<String>,
-	remote_user: Option<String>,
-	deploy_path: Option<String>,
-	keep_releases: Option<String>,
-	http_user: Option<String>,
-	php_path: Option<String>,
-	shared_files: Option<Vec<String>>,
-	shared_dirs: Option<Vec<String>>,
-	writable_use_sudo: Option<bool>,
-	writable_recursive: Option<bool>,
-	writable_chmod_mode: Option<String>,
-	writable_dirs: Option<Vec<String>>,
-	tasks: Option<Vec<String>>,
+	pub repository: Option<String>,
+	pub hostname: Option<String>,
+	pub remote_user: Option<String>,
+	pub deploy_path: Option<String>,
+	pub keep_releases: Option<String>,
+	pub http_user: Option<String>,
+	pub php_path: Option<String>,
+	pub shared_files: Option<Vec<String>>,
+	pub shared_dirs: Option<Vec<String>>,
+	pub writable_use_sudo: Option<bool>,
+	pub writable_recursive: Option<bool>,
+	pub writable_chmod_mode: Option<String>,
+	pub writable_dirs: Option<Vec<String>>,
+	pub tasks: Option<Vec<String>>,
 }
 
 impl Deployer {
@@ -43,42 +43,23 @@ impl Deployer {
 		}
 		let contents = std::fs::read_to_string(path).expect("Failed to read config file");
 		let deployer: Deployer = serde_yaml::from_str(&contents).expect("Failed to parse config file");
-		println!("{:#?}", deployer);
+		self.repository = deployer.repository;
+		self.hostname = deployer.hostname;
+		self.remote_user = deployer.remote_user;
+		self.deploy_path = deployer.deploy_path;
+		self.keep_releases = deployer.keep_releases;
+		self.http_user = deployer.http_user;
+		self.php_path = deployer.php_path;
+		self.shared_files = deployer.shared_files;
+		self.shared_dirs = deployer.shared_dirs;
+		self.writable_use_sudo = deployer.writable_use_sudo;
+		self.writable_recursive = deployer.writable_recursive;
+		self.writable_chmod_mode = deployer.writable_chmod_mode;
+		self.writable_dirs = deployer.writable_dirs;
+		self.tasks = deployer.tasks;
 	}
-	pub fn deploy(&self) {}
-}
-
-impl Default for Deployer {
-	fn default() -> Self {
-		Self {
-			repository: Some("git@github.com:samirdjelal/deployer.git".to_string()),
-			hostname: Some("localhost".to_string()),
-			remote_user: Some("root".to_string()),
-			deploy_path: Some("/data/wwwroot/default".to_string()),
-			keep_releases: Some("5".to_string()),
-			http_user: Some("daemon".to_string()),
-			php_path: Some("/usr/local/php/bin/php".to_string()),
-			shared_files: Some(vec![".env".to_string()]),
-			shared_dirs: Some(vec!["storage".to_string()]),
-			writable_use_sudo: Some(false),
-			writable_recursive: Some(true),
-			writable_chmod_mode: Some("0777".to_string()),
-			writable_dirs: Some(vec![
-				"bootstrap/cache".to_string(),
-				"storage".to_string(),
-				"storage/app".to_string(),
-				"storage/app/public".to_string(),
-				"storage/framework".to_string(),
-				"storage/framework/cache".to_string(),
-				"storage/framework/sessions".to_string(),
-				"storage/framework/views".to_string(),
-				"storage/logs".to_string(),
-			]),
-			tasks: Some(vec![
-				"php artisan optimize".to_string(),
-				"php artisan migrate".to_string(),
-				"php artisan db:seed".to_string(),
-			]),
-		}
+	pub fn deploy(&self) {
+		println!("Deploying...");
+		println!("{:#?}", self);
 	}
 }
