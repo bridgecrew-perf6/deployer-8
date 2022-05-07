@@ -17,7 +17,7 @@ A simple Laravel deployer for your projects.
 
 ```bash
 $ cargo install deployer
-$ deployer config.yml
+$ deployer deployer.yml
 ```
 
 ### Using the crate
