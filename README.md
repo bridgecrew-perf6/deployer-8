@@ -16,8 +16,8 @@ A simple Laravel deployer for your projects.
 ### Using the binary
 
 ```bash
-💲 cargo install deployer
-💲 deployer config.yml
+$ cargo install deployer
+$ deployer config.yml
 ```
 
 ### Using the crate
@@ -46,18 +46,17 @@ fn main() {
 
 ```bash
 # Dev
-💲 cargo run -- config.yml
+$ cargo run -- deployer.yml
 
 # Build
-💲 cargo build
-💲 target/debug/deployer config.yml
+$ cargo build
+$ target/debug/deployer deployer.yml
 
 # Test
-💲 cargo test
+$ cargo test
 ```
 
----
-### Configurations
+Configuration file `deployer.yml`
 ```yaml
 ---
 repository: git@github.com:samirdjelal/deployer.git
