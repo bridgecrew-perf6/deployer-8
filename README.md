@@ -61,11 +61,12 @@ Configuration file `deployer.yml`
 ---
 repository: git@github.com:samirdjelal/deployer.git
 hostname: localhost
-remote_user: root
+username: root
+password: root
 deploy_path: /data/wwwroot/default
 keep_releases: 5
 http_user: daemon
-php_path: /usr/local/php/bin/php
+php_path: 
 
 shared_files:
   - .env
@@ -87,8 +88,8 @@ writable_dirs:
   - storage/framework/views
   - storage/logs
 
-tasks:
-  - php artisan optimize
+commands:
+  - ls -lah /opt/lampp/xampp
   - php artisan migrate
   - php artisan db:seed
 ```

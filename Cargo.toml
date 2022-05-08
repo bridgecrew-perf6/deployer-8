@@ -27,3 +27,4 @@ path = "src/main.rs"
 serde = { version = "1.0.137", features = ["derive"] }
 serde_yaml = "0.8.24"
 ssh2 = "0.9"
+colored = "2"

@@ -1,11 +1,12 @@
 ---
 repository: git@github.com:samirdjelal/deployer.git
-hostname: localhost
-remote_user: root
-deploy_path: /data/wwwroot/default
+hostname: 127.0.0.1:22
+username: root
+password: password
+deploy_path: /opt/deployer
 keep_releases: 5
 http_user: daemon
-php_path: /usr/local/php/bin/php
+php_path:
 
 shared_files:
   - .env
@@ -27,7 +28,7 @@ writable_dirs:
   - storage/framework/views
   - storage/logs
 
-tasks:
-  - php artisan optimize
-  - php artisan migrate
-  - php artisan db:seed
+commands:
+  - ls -lah /opt/lampp/xampp
+  - echo "Hello World" > /root/file.txt
+  - cat /root/file.txt
