@@ -52,7 +52,7 @@ $ cargo run -- deployer.yml
 
 # Build
 $ cargo build
-$ target/debug/deployer deployer.yml
+$ target/release/deployer deployer.yml
 
 # Test
 $ cargo test
