@@ -28,7 +28,10 @@ writable_dirs:
   - storage/framework/views
   - storage/logs
 
-commands:
+pre_deploy_commands:
   - ls -lah /opt/lampp/xampp
   - echo "Hello World" > /root/file.txt
   - cat /root/file.txt
+
+post_deploy_commands:
+  - echo "Good bye!"

@@ -59,14 +59,15 @@ $ cargo test
 Configuration file `deployer.yml`
 ```yaml
 ---
+---
 repository: git@github.com:samirdjelal/deployer.git
-hostname: localhost
+hostname: 127.0.0.1:22
 username: root
-password: root
-deploy_path: /data/wwwroot/default
+password: password
+deploy_path: /opt/deployer
 keep_releases: 5
 http_user: daemon
-php_path: 
+php_path:
 
 shared_files:
   - .env
@@ -88,10 +89,13 @@ writable_dirs:
   - storage/framework/views
   - storage/logs
 
-commands:
+pre_deploy_commands:
   - ls -lah /opt/lampp/xampp
-  - php artisan migrate
-  - php artisan db:seed
+  - echo "Hello World" > /root/file.txt
+  - cat /root/file.txt
+
+post_deploy_commands:
+  - echo "Good bye!"
 ```
 
 ---

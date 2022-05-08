@@ -21,7 +21,8 @@ pub struct Deployer {
 	pub writable_recursive: Option<bool>,
 	pub writable_chmod_mode: Option<String>,
 	pub writable_dirs: Option<Vec<String>>,
-	pub commands: Option<Vec<String>>,
+	pub pre_deploy_commands: Option<Vec<String>>,
+	pub post_deploy_commands: Option<Vec<String>>,
 }
 
 impl Deployer {
@@ -41,7 +42,8 @@ impl Deployer {
 			writable_recursive: None,
 			writable_chmod_mode: None,
 			writable_dirs: None,
-			commands: None,
+			pre_deploy_commands: None,
+			post_deploy_commands: None,
 		}
 	}
 	pub fn configure(&mut self, path: &str) {
@@ -71,7 +73,8 @@ impl Deployer {
 						self.writable_recursive = deployer.writable_recursive;
 						self.writable_chmod_mode = deployer.writable_chmod_mode;
 						self.writable_dirs = deployer.writable_dirs;
-						self.commands = deployer.commands;
+						self.pre_deploy_commands = deployer.pre_deploy_commands;
+						self.post_deploy_commands = deployer.post_deploy_commands;
 					}
 					Err(_) => {
 						println!("[!] {}", "Failed to parse config file".red());
@@ -99,29 +102,35 @@ impl Deployer {
 		
 		match sess.authenticated() {
 			true => {
-				for command in self.commands.clone().unwrap() {
-					let exit_status = Self::exec(sess.clone(), command.clone());
-					match exit_status {
-						0 => println!("[+] {}: {}", "Command executed successfully".bright_green(), command.clone()),
-						_ => println!("[!] {}: {}", "Command failed to execute".red(), command.clone()),
-					}
-				}
+				self.execute_list(sess.clone(), self.pre_deploy_commands.clone().unwrap());
+				// todo: deploy commands
+				self.execute_list(sess.clone(), self.post_deploy_commands.clone().unwrap());
 			}
 			false => {
 				panic!("[!] {}", "Failed to authenticate".red());
 			}
 		}
 	}
+	pub fn execute_list(&self, sess: Session, commands: Vec<String>) {
+		for command in commands {
+			let _ = Self::execute_command(sess.clone(), command.clone());
+		}
+	}
 	
-	fn exec(sess: Session, command: String) -> i32 {
+	fn execute_command(sess: Session, command: String) -> i32 {
 		let mut channel = sess.channel_session().unwrap();
 		channel.exec(command.as_str()).unwrap();
 		let mut buffer = String::new();
 		channel.read_to_string(&mut buffer).unwrap();
+		channel.wait_close().unwrap();
+		let exit_status = channel.exit_status().unwrap();
+		match exit_status {
+			0 => println!("[+] {}: {}", "Command executed successfully".bright_green(), command.clone()),
+			_ => println!("[!] {}: {}", "Command failed to execute".red(), command.clone()),
+		}
 		if buffer.len() > 0 {
 			println!("\n{}", buffer.yellow());
 		}
-		channel.wait_close().unwrap();
 		return channel.exit_status().unwrap();
 	}
 }
