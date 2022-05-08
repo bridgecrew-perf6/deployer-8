@@ -61,7 +61,6 @@ $ cargo test
 Configuration file `deployer.yml`
 ```yaml
 ---
----
 repository: git@github.com:samirdjelal/deployer.git
 hostname: 127.0.0.1:22
 username: root
