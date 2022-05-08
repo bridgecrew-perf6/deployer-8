@@ -25,7 +25,7 @@ Add the following dependency to the Cargo.toml file:
 
 ```toml
 [dependencies]
-deployer = "0.0.1"
+deployer = "0.0.2"
 ```
 
 And then get started in your `main.rs`:

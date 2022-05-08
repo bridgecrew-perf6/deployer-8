@@ -1,6 +1,6 @@
 [package]
 name = "deployer"
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 authors = ["Samir Djelal <ssdjelal@gmail.com>"]
 readme = "README.md"
@@ -11,6 +11,8 @@ documentation = "https://docs.rs/deployer"
 keywords = ["laravel", "deployer", "deploy", "zero-downtime", "continuous-delivery"]
 description = "Laravel Zero Downtime"
 exclude = [
+	"deployer-test.yml",
+	".github/*",
 	"screenshot/*",
 	"examples/*",
 ]
