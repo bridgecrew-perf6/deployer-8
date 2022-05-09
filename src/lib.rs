@@ -2,6 +2,7 @@ use std::i32;
 use colored::*;
 use serde::{Serialize, Deserialize};
 use std::io::prelude::*;
+use std::io::stdout;
 use std::net::{TcpStream};
 use ssh2::Session;
 
@@ -102,7 +103,7 @@ impl Deployer {
 		
 		match sess.authenticated() {
 			true => {
-				self.execute_list(sess.clone(), self.pre_deploy_commands.clone().unwrap());
+				self.execute_list(sess.clone(), self.pre_deploy_commands.clone().unwrap(), true);
 				let wd = (self.deploy_path.clone()).unwrap();
 				let repo = (self.repository.clone()).unwrap();
 				let http_user = (self.http_user.clone()).unwrap();
@@ -115,10 +116,10 @@ impl Deployer {
 					format!("rm -f {}/release/composer.lock", wd),
 					format!("cd {}/release && composer install --no-interaction", wd),
 					format!("chown -R {} {}/release", http_user, wd),
-				]);
+				], false);
 				// format!("ln -s ...", wd.clone()),
 				// format!("rm -rf {}/release", wd.clone()),
-				self.execute_list(sess.clone(), self.post_deploy_commands.clone().unwrap());
+				self.execute_list(sess.clone(), self.post_deploy_commands.clone().unwrap(), true);
 			}
 			false => {
 				println!("[!] {}", "Failed to authenticate".red());
@@ -126,14 +127,15 @@ impl Deployer {
 			}
 		}
 	}
-	pub fn execute_list(&self, sess: Session, commands: Vec<String>) {
+	pub fn execute_list(&self, sess: Session, commands: Vec<String>, show_output: bool) {
 		for command in commands {
-			let _ = Self::execute_command(sess.clone(), command.clone());
-			std::thread::sleep(std::time::Duration::from_millis(100));
+			let _ = Self::execute_command(sess.clone(), command.clone(), show_output);
 		}
 	}
 	
-	fn execute_command(sess: Session, command: String) -> i32 {
+	fn execute_command(sess: Session, command: String, show_output: bool) -> i32 {
+		print!("[~] {}: {}", command.clone(), "Running".yellow());
+		let _ = stdout().flush();
 		let mut channel = sess.channel_session().unwrap();
 		channel.exec(command.as_str()).unwrap();
 		let mut buffer = String::new();
@@ -141,10 +143,11 @@ impl Deployer {
 		channel.wait_close().unwrap();
 		let exit_status = channel.exit_status().unwrap();
 		match exit_status {
-			0 => println!("[+] {}: {}", "Command executed successfully".bright_green(), command.clone()),
-			_ => println!("[!] {}: {}", "Command failed to execute".red(), command.clone())
+			0 => println!("\r[+] {}: {}   ", command.clone(), "Success".bright_green()),
+			_ => println!("\r[!] {}: {}   ", command.clone(), "Failed".red()),
 		}
-		if buffer.len() > 0 {
+		let _ = stdout().flush();
+		if buffer.len() > 0 && show_output == true {
 			println!("\n{}", buffer.yellow());
 		}
 		if exit_status != 0 {
