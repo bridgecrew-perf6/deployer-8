@@ -103,7 +103,7 @@ impl Deployer {
 		
 		match sess.authenticated() {
 			true => {
-				self.execute_list(sess.clone(), self.pre_deploy_commands.clone().unwrap(), true);
+				self.execute_list(sess.clone(), self.pre_deploy_commands.clone().unwrap(), true, true);
 				let wd = (self.deploy_path.clone()).unwrap();
 				let repo = (self.repository.clone()).unwrap();
 				let http_user = (self.http_user.clone()).unwrap();
@@ -116,10 +116,10 @@ impl Deployer {
 					format!("rm -f {}/release/composer.lock", wd),
 					format!("cd {}/release && composer install --no-interaction", wd),
 					format!("chown -R {} {}/release", http_user, wd),
-				], false);
+				], true, false);
 				// format!("ln -s ...", wd.clone()),
 				// format!("rm -rf {}/release", wd.clone()),
-				self.execute_list(sess.clone(), self.post_deploy_commands.clone().unwrap(), true);
+				self.execute_list(sess.clone(), self.post_deploy_commands.clone().unwrap(), true, true);
 			}
 			false => {
 				println!("[!] {}", "Failed to authenticate".red());
@@ -127,32 +127,36 @@ impl Deployer {
 			}
 		}
 	}
-	pub fn execute_list(&self, sess: Session, commands: Vec<String>, show_output: bool) {
+	pub fn execute_list(&self, sess: Session, commands: Vec<String>, show_input: bool, show_output: bool) {
 		for command in commands {
-			let _ = Self::execute_command(sess.clone(), command.clone(), show_output);
+			let _ = Self::execute_command(sess.clone(), command.clone(), show_input, show_output);
 		}
 	}
 	
-	fn execute_command(sess: Session, command: String, show_output: bool) -> i32 {
-		print!("[~] {}: {}", command.clone(), "Running".yellow());
-		let _ = stdout().flush();
+	fn execute_command(sess: Session, command: String, show_input: bool, show_output: bool) -> (i32, String) {
+		if show_input == true {
+			print!("[~] {}: {}", command.clone(), "Running".yellow());
+			let _ = stdout().flush();
+		}
 		let mut channel = sess.channel_session().unwrap();
 		channel.exec(command.as_str()).unwrap();
 		let mut buffer = String::new();
 		channel.read_to_string(&mut buffer).unwrap();
 		channel.wait_close().unwrap();
 		let exit_status = channel.exit_status().unwrap();
-		match exit_status {
-			0 => println!("\r[+] {}: {}   ", command.clone(), "Success".bright_green()),
-			_ => println!("\r[!] {}: {}   ", command.clone(), "Failed".red()),
+		if show_input == true {
+			match exit_status {
+				0 => println!("\r[+] {}: {}   ", command.clone(), "Success".bright_green()),
+				_ => println!("\r[!] {}: {}   ", command.clone(), "Failed".red()),
+			}
+			let _ = stdout().flush();
 		}
-		let _ = stdout().flush();
 		if buffer.len() > 0 && show_output == true {
 			println!("\n{}", buffer.yellow());
 		}
 		if exit_status != 0 {
 			std::process::exit(1);
 		}
-		return channel.exit_status().unwrap();
+		return (channel.exit_status().unwrap(), buffer);
 	}
 }
