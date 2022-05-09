@@ -103,17 +103,33 @@ impl Deployer {
 		match sess.authenticated() {
 			true => {
 				self.execute_list(sess.clone(), self.pre_deploy_commands.clone().unwrap());
-				// todo: deploy commands
+				let wd = (self.deploy_path.clone()).unwrap();
+				let repo = (self.repository.clone()).unwrap();
+				let http_user = (self.http_user.clone()).unwrap();
+				//todo: check if composer and npm/node is installed
+				self.execute_list(sess.clone(), vec![
+					// format!("mkdir -p {}/shared", wd.clone()),
+					format!("rm -rf {}/release", wd),
+					format!("mkdir -p {}/release", wd),
+					format!("git clone {} {}/release", repo, wd),
+					format!("rm -f {}/release/composer.lock", wd),
+					format!("cd {}/release && composer install --no-interaction", wd),
+					format!("chown -R {} {}/release", http_user, wd),
+				]);
+				// format!("ln -s ...", wd.clone()),
+				// format!("rm -rf {}/release", wd.clone()),
 				self.execute_list(sess.clone(), self.post_deploy_commands.clone().unwrap());
 			}
 			false => {
-				panic!("[!] {}", "Failed to authenticate".red());
+				println!("[!] {}", "Failed to authenticate".red());
+				std::process::exit(1);
 			}
 		}
 	}
 	pub fn execute_list(&self, sess: Session, commands: Vec<String>) {
 		for command in commands {
 			let _ = Self::execute_command(sess.clone(), command.clone());
+			std::thread::sleep(std::time::Duration::from_millis(100));
 		}
 	}
 	
@@ -126,10 +142,13 @@ impl Deployer {
 		let exit_status = channel.exit_status().unwrap();
 		match exit_status {
 			0 => println!("[+] {}: {}", "Command executed successfully".bright_green(), command.clone()),
-			_ => println!("[!] {}: {}", "Command failed to execute".red(), command.clone()),
+			_ => println!("[!] {}: {}", "Command failed to execute".red(), command.clone())
 		}
 		if buffer.len() > 0 {
 			println!("\n{}", buffer.yellow());
+		}
+		if exit_status != 0 {
+			std::process::exit(1);
 		}
 		return channel.exit_status().unwrap();
 	}
