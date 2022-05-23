@@ -1,4 +1,3 @@
-use anyhow::Result;
 use colored::*;
 use serde::{Deserialize, Serialize};
 use ssh2::Session;
@@ -91,7 +90,7 @@ impl Deployer {
             }
         }
     }
-    pub fn deploy(&self) -> Result<()>{
+    pub fn deploy(&self) {
         println!("[~] {}", "Deploying...".bright_cyan());
 
         let hostname = self.hostname.clone();
@@ -144,7 +143,6 @@ impl Deployer {
                 std::process::exit(1);
             }
         }
-	    Ok(())
     }
     pub fn execute_list(
         &self,
